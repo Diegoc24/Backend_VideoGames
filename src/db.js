@@ -4,14 +4,26 @@ const fs = require('fs');
 const path = require('path');
 const pg = require("pg")
 const {
-  DATABASE_URL
+  DATABASE_URL,
+  IS_DEPLOYED
 } = process.env;
+let sequelize = "";
+if(IS_DEPLOYED === "true"){
+  sequelize = new Sequelize(`${DATABASE_URL}?sslmode=require`,
+  {
+    logging: false, 
+    native: false, 
+    dialectModule: pg,
+  }
+  );
 
-const sequelize = new Sequelize(DATABASE_URL, {
+}else if(IS_DEPLOYED === "false"){
+  sequelize = new Sequelize(DATABASE_URL, {
   logging: false, // set to console.log to see the raw SQL queries
   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
   dialectModule: pg,
 });
+}
 const basename = path.basename(__filename);
 
 const modelDefiners = [];
